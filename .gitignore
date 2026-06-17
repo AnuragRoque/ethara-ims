@@ -1,0 +1,47 @@
+# ---- Secrets / environment ----
+.env
+.env.*
+!.env.example
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ---- Node / Frontend ----
+node_modules/
+frontend/dist/
+frontend/build/
+.vite/
+*.local
+
+# ---- Editor / OS ----
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# other files
+
+bkup/
+backup/
+trash/
+PROJECT_PLAN.md
+
+
+# ---- Logs ----
+*.log
+npm-debug.log*
