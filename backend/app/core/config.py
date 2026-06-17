@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     POSTGRES_PORT: int = 5432
 
     # Comma-separated list of origins the frontend is served from.
-    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
+    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173,http://localhost:5174,http://localhost:5175,http://127.0.0.1:5173,http://127.0.0.1:5174"
 
     # Products below this quantity are flagged as low stock on the dashboard.
     LOW_STOCK_THRESHOLD: int = 10
