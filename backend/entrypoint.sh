@@ -11,10 +11,11 @@ if [ "${SEED_ON_STARTUP:-false}" = "true" ]; then
   python -m app.seed
 fi
 
-echo "==> Starting Gunicorn with Uvicorn workers on 0.0.0.0:8000"
+# Bind to $PORT when the host provides one (Render/Heroku); default to 8000 locally.
+echo "==> Starting Gunicorn with Uvicorn workers on 0.0.0.0:${PORT:-8000}"
 exec gunicorn app.main:app \
   --worker-class uvicorn.workers.UvicornWorker \
-  --bind 0.0.0.0:8000 \
+  --bind "0.0.0.0:${PORT:-8000}" \
   --workers "${WEB_CONCURRENCY:-2}" \
   --access-logfile - \
   --error-logfile -

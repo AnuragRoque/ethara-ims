@@ -1,0 +1,39 @@
+# Render Blueprint — provisions a managed Postgres database + the backend API
+# as one unit. Deploy by pushing to GitHub, then in Render:
+#   Dashboard → New → Blueprint → select this repo → Apply.
+# Spec: https://render.com/docs/blueprint-spec
+#
+# NOTE: the frontend is deployed separately on Vercel (see DEPLOYMENT.md).
+
+databases:
+  - name: ethara-db
+    plan: free                 # free Postgres (limited storage; expires after ~30 days)
+    databaseName: ethara_ims
+    user: ethara
+
+services:
+  - type: web
+    name: ethara-backend
+    runtime: docker            # (older Render blueprints use `env: docker` instead)
+    plan: free
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      # Injected from the managed database above. Our config rewrites the
+      # postgresql:// URL to the psycopg (v3) driver automatically.
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ethara-db
+          property: connectionString
+      # Set this to your live Vercel URL after the frontend is deployed,
+      # e.g. https://ethara-ims.vercel.app  (comma-separate multiple origins).
+      - key: CORS_ORIGINS
+        sync: false
+      - key: LOW_STOCK_THRESHOLD
+        value: "10"
+      - key: SEED_ON_STARTUP
+        value: "true"          # seed demo data on first boot; set false to skip
+      - key: WEB_CONCURRENCY
+        value: "2"

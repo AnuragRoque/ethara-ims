@@ -36,13 +36,28 @@ class Settings(BaseSettings):
     @computed_field  # type: ignore[prop-decorator]
     @property
     def sqlalchemy_url(self) -> str:
-        """Resolve the SQLAlchemy connection URL (psycopg v3 driver)."""
+        """Resolve the SQLAlchemy connection URL, pinned to the psycopg (v3) driver."""
         if self.DATABASE_URL:
-            return self.DATABASE_URL
+            return self._with_psycopg_driver(self.DATABASE_URL)
         return (
             f"postgresql+psycopg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
             f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         )
+
+    @staticmethod
+    def _with_psycopg_driver(url: str) -> str:
+        """Force the psycopg (v3) driver on managed-host connection strings.
+
+        Render/Heroku/Railway hand out ``postgres://`` or ``postgresql://`` URLs,
+        which SQLAlchemy maps to the psycopg2 driver we don't install. Rewrite
+        them to ``postgresql+psycopg://``. URLs that already name a driver
+        (e.g. ``postgresql+psycopg://``) are left untouched.
+        """
+        if url.startswith("postgres://"):
+            url = "postgresql://" + url[len("postgres://") :]
+        if url.startswith("postgresql://"):
+            url = "postgresql+psycopg://" + url[len("postgresql://") :]
+        return url
 
     @property
     def cors_origins_list(self) -> list[str]:
