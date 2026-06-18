@@ -1,0 +1,14 @@
+# Shell scripts must keep LF endings so they run inside Linux containers,
+# even when the repo is checked out on Windows (autocrlf).
+*.sh        text eol=lf
+entrypoint.sh text eol=lf
+
+# Normalize line endings for common text files.
+*.py        text
+*.js        text
+*.jsx       text
+*.json      text
+*.yml       text
+*.yaml      text
+*.md        text
+Dockerfile  text eol=lf

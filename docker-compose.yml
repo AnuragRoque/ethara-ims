@@ -1,0 +1,62 @@
+# Ethara Inventory & Order Management System — full stack.
+#   docker compose up --build   →   db (Postgres) + backend (FastAPI) + frontend (Nginx)
+#
+# All credentials/config come from the .env file in this directory (see .env.example).
+# No secrets are hardcoded here.
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: ethara-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+    container_name: ethara-backend
+    environment:
+      # Built from the same Postgres vars; points at the `db` service over the compose network.
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      LOW_STOCK_THRESHOLD: ${LOW_STOCK_THRESHOLD:-10}
+      SEED_ON_STARTUP: ${SEED_ON_STARTUP:-true}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Baked into the JS bundle at build time (the browser, not the container, calls this URL).
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000}
+    container_name: ethara-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+
+volumes:
+  pgdata:

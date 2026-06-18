@@ -1,0 +1,27 @@
+# Virtualenvs / caches — never ship these into the image
+.venv
+venv
+env
+__pycache__
+**/__pycache__
+*.py[cod]
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.coverage
+htmlcov
+
+# Secrets & local config
+.env
+.env.*
+!.env.example
+
+# Tests and docs aren't needed at runtime
+tests
+*.md
+
+# VCS / editor noise
+.git
+.gitignore
+.vscode
+.idea
