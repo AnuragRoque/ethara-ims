@@ -7,10 +7,8 @@ setup that runs the whole stack with a single command.
 **Live demo**
 
 - Frontend: https://ethara-ims-navy.vercel.app/
-- Backend API (Swagger docs at `/docs`): https://ethara-backend-rjga.onrender.com/
+- Backend API: https://ethara-backend-rjga.onrender.com/
 
-> The backend runs on a free Render instance, so the first request after a period of
-> inactivity can take 30–60 seconds to wake up. After that it responds normally.
 
 ---
 
